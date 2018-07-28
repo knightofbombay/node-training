@@ -1,13 +1,26 @@
 const path = require('path');
 const express = require('express');
 const fs = require('fs');
+const socketIO = require('socket.io');
+const http = require('http');
 
 const port = process.env.port || 3000
 const publicPath = path.join(__dirname, '../public');
 
 var app = express();
+var server = http.createServer(app);
+var io = socketIO(server);
 
 app.use(express.static(publicPath));
+
+io.on('connection', (socket) => {
+    console.log('New user connected');  
+    
+    socket.on('disconnect', (socket) => {
+        console.log('User got disconnected');
+    });
+});
+
 
 app.use((req, res, next) => {
     now = new Date().toString();
@@ -22,6 +35,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is up on port ${port}`);
 });
