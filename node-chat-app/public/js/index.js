@@ -9,6 +9,10 @@ socket.on('connect', function() {
         text: 'This is my message!'
     });
     */
+
+    socket.on('admin', function(message) {
+        console.log(message);
+    })
 });
 
 socket.on('disconnect', function() {
