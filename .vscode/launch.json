@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/node-chat-app/server/server.js"
+            "program": "${workspaceFolder}/node-chat-app/server\\server.js"
             //"program": "${workspaceFolder}/node-todo-api/server\\server.js"
             //"program": "${workspaceFolder}/node-todo-api/playground\\mongodb-find.js"
             //"args": ["-a 07029"]
