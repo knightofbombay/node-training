@@ -3,6 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const socketIO = require('socket.io');
 const http = require('http');
+const {toUpper} = require('lodash');
 
 const {generateMessage, generateLocationMessage} = require('./utils/message');
 const {isRealString} = require('./utils/validation');
@@ -25,19 +26,30 @@ io.on('connection', (socket) => {
         if (!isRealString(params.name) || !isRealString(params.room)) {
             return callback("Name and room name are required");
         }
-        
-        socket.join(params.room);
-        users.removeUser(socket.id);
-        users.addUser(socket.id, params.name, params.room);
 
-        io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+        //check if user already exists in the room
+        let userFlag = (users.users.filter((user) => user.name === params.name).length > 0)
+        let roomFlag = (users.users.filter((user) => user.room === params.room).length > 0);
+
+        if ((users.users.length) > 0 && userFlag && roomFlag) {
+            return callback("User already exists!")
+        }
+
+        //store room in uppercase so that a unique room is created
+        var room = toUpper(params.room);
+
+        socket.join(room);
+        users.removeUser(socket.id);
+        users.addUser(socket.id, params.name, room);
+
+        io.to(room).emit('updateUserList', users.getUserList(room));
 
         // io.emit ->  io.to('The Office Fans").emit
         // socket.broadcast.emit - socket.broadcast.to('The Office Fans").emit
         // socket.emit
 
         socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
-        socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined`))
+        socket.broadcast.to(room).emit('newMessage', generateMessage('Admin', `${params.name} has joined`))
         callback();
     });
 
